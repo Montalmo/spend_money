@@ -14,40 +14,46 @@ class ChartBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      SizedBox(
-        height: 20.0,
-        child: FittedBox(
-          child: Text('\$ ${spendingAmount.toStringAsFixed(0)}'),
-        ),
-      ),
-      const SizedBox(height: 4.0),
-      SizedBox(
-        height: 60.0,
-        width: 10,
-        child: Stack(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1.0),
-                color: const Color.fromRGBO(220, 220, 220, 1),
-                borderRadius: BorderRadius.circular(20.0),
+            SizedBox(
+              height: 20.0,
+              child: FittedBox(
+                child: Text('\$ ${spendingAmount.toStringAsFixed(0)}'),
               ),
             ),
-            FractionallySizedBox(
-              heightFactor: spendingPctOfTotal,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
+            const SizedBox(height: 4.0),
+            SizedBox(
+              height: constraints.maxHeight * .5,
+              width: 10,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 1.0),
+                      color: const Color.fromRGBO(220, 220, 220, 1),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    heightFactor: spendingPctOfTotal,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+            const SizedBox(height: 4.0),
+            Text(lable),
           ],
-        ),
-      ),
-      const SizedBox(height: 4.0),
-      Text(lable),
-    ]);
+        );
+      },
+    );
   }
 }
