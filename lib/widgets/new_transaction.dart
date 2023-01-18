@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
-  NewTransaction({super.key, required this.addTx});
+  const NewTransaction({super.key, required this.addTx});
 
   final Function addTx;
 
@@ -10,24 +11,45 @@ class NewTransaction extends StatefulWidget {
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  final TextEditingController titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  DateTime? _selectedDate;
 
-  final TextEditingController amountController = TextEditingController();
+  void _submitData() {
+    if (_amountController.text.isEmpty) {
+      return;
+    }
+    final _enteredTitle = _titleController.text;
+    final _enteredAmount = double.parse(_amountController.text);
 
-  void submitData() {
-    final enteredTitle = titleController.text;
-    final enteredAmount = double.parse(amountController.text);
-
-    if (enteredTitle.isEmpty || enteredAmount <= 0) {
+    if (_enteredTitle.isEmpty || _enteredAmount <= 0 || _selectedDate == null) {
       return;
     }
 
     widget.addTx(
-      enteredTitle,
-      enteredAmount,
+      _enteredTitle,
+      _enteredAmount,
+      _selectedDate,
     );
 
     Navigator.of(context).pop();
+  }
+
+  void _pressentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2019),
+      lastDate: DateTime.now(),
+    ).then((picketDate) {
+      if (picketDate == null) {
+        return;
+      }
+
+      setState(() {
+        _selectedDate = picketDate;
+      });
+    });
   }
 
   @override
@@ -35,29 +57,33 @@ class _NewTransactionState extends State<NewTransaction> {
     return Card(
       elevation: 5,
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             TextField(
-              decoration: InputDecoration(labelText: 'Title'),
-              controller: titleController,
-              onSubmitted: (_) => submitData(),
+              decoration: const InputDecoration(labelText: 'Title'),
+              controller: _titleController,
+              onSubmitted: (_) => _submitData(),
             ),
             TextField(
-              decoration: InputDecoration(labelText: 'Amount'),
-              controller: amountController,
+              decoration: const InputDecoration(labelText: 'Amount'),
+              controller: _amountController,
               keyboardType: TextInputType.number,
-              onSubmitted: (_) => submitData(),
+              onSubmitted: (_) => _submitData(),
             ),
-            Container(
+            SizedBox(
               height: 56.0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('No Date chosen!'),
+                  Text(
+                    _selectedDate == null
+                        ? 'No Date chosen!'
+                        : DateFormat.yMd().format(_selectedDate!),
+                  ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: _pressentDatePicker,
                     child: const Text(
                       'Choose Date',
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -67,10 +93,10 @@ class _NewTransactionState extends State<NewTransaction> {
               ),
             ),
             ElevatedButton(
-              child: Text(
+              onPressed: _submitData,
+              child: const Text(
                 'Add Transaction',
               ),
-              onPressed: submitData,
             ),
           ],
         ),
